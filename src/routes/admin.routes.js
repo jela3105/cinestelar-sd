@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/admin.controller');
-//const { isAdmin } = require('../middlewares/auth.middleware');
+const { isAdmin } = require('../middlewares/auth.middleware');
+
+//router.use(isAdmin);
 
 // Películas
-router.get('/peliculas', adminController.listarPeliculas);
+router.get('/', adminController.listarPeliculas);
 /*
 router.get('/peliculas/nueva', isAdmin, adminController.formNuevaPelicula);
 router.post('/peliculas/nueva', isAdmin, adminController.guardarPelicula);

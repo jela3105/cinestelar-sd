@@ -1,0 +1,43 @@
+<%- include('header') %>
+<h1>Películas disponibles</h1>
+<a href="/admin/peliculas/nueva">Agregar nueva película</a>
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Resumen</th>
+      <th>Año</th>
+      <th>Duración</th>
+      <th>Idioma</th>
+      <th>Director</th>
+      <th>Costo</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% peliculas.forEach(p=> { %>
+    <tr>
+      <td><%= p.ID_Pelicula %></td>
+      <td><%= p.Nombre %></td>
+      <td><%= p.Resumen %></td>
+      <td><%= p.Año %></td>
+      <td><%= p.Duración %></td>
+      <td><%= p.Idioma %></td>
+      <td><%= p.Director %></td>
+      <td>$ <%= p.Costo.toFixed(2) %></td>
+      <td>
+        <a href="/admin/peliculas/editar/<%= p.ID_Pelicula %>">Editar</a> |
+        <form
+          action="/admin/peliculas/eliminar/<%= p.ID_Pelicula %>"
+          method="POST"
+          style="display: inline"
+        >
+          <button type="submit">Eliminar</button>
+        </form>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('../partials/footer') %>

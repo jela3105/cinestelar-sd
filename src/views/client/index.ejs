@@ -1,0 +1,22 @@
+<%- include('header') %>
+
+<h2>🎟️ Cartelera</h2>
+
+<% Object.values(cartelera).forEach(pelicula => { %>
+<section style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px">
+  <h3><%= pelicula.nombre %></h3>
+  <p><%= pelicula.resumen %></p>
+
+  <h4>Funciones disponibles:</h4>
+  <ul>
+    <% pelicula.funciones.forEach(funcion => { %>
+    <li>
+      <strong> <%= funcion.fecha %>- <%= funcion.hora %> </strong> en sala <%=
+      funcion.sala %><a href="/comprar/<%= funcion.id_funcion %>"
+        >Comprar boleto</a
+      >
+    </li>
+    <% }) %>
+  </ul>
+</section>
+<% }) %> <%- include('../partials/footer') %>

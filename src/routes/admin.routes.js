@@ -9,11 +9,10 @@ const { isAdmin } = require("../middlewares/auth.middleware");
 router.get("/", adminController.listarPeliculas);
 router.get("/peliculas/nueva", (req, res) => { res.render("admin/nuevaPelicula"); });
 router.post('/peliculas/nueva', adminController.guardarPelicula);
-/*
 router.get('/peliculas/editar/:id', adminController.formEditarPelicula);
-router.post('/peliculas/editar/:id', adminController.actualizarPelicula);
+/*
+router.put('/peliculas/editar/:id', adminController.actualizarPelicula);
 router.post('/peliculas/eliminar/:id', adminController.eliminarPelicula);
-
 // Empleados
 router.get('/empleados', adminController.listarEmpleados);
 router.get('/empleados/nuevo', adminController.formNuevoEmpleado);

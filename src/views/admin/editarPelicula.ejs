@@ -1,0 +1,67 @@
+<%- include('header') %>
+<h1>Editar pelicula pelicula</h1>
+
+<% if (typeof error !== 'undefined') { %>
+<h4 style="color: #c62828"><%= error %></h4>
+<% } %>
+
+<form action="/admin/peliculas/editar/<%= pelicula.ID_Pelicula %>" method="PUT">
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="nombre">Nombre:</label>
+      <input
+        value="<%= pelicula.Nombre %>"
+        type="text"
+        id="nombre"
+        name="nombre"
+        class="input-field"
+        required
+      />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="resumen">Resumen:</label>
+      <textarea id="resumen" class="materialize-textarea" name="resumen" required><%= pelicula.Resumen %></textarea>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="año">Año:</label>
+      <input type="number" id="año" name="año" value="<%= pelicula.Año %>" required />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="duracion">Duración (minutos):</label>
+      <input type="number" id="duracion" name="duracion" value="<%= pelicula.Duración%>" required />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="costo">Costo:</label>
+      <input type="number" step="0.01" id="costo" name="costo" value="<%= pelicula.Costo %>"required />
+    </div>
+  </div>
+  
+<div class="row">
+    <div class="input-field col s2">
+        <button type="submit"
+            class="waves-effect waves-teal btn yellow darken-2">
+            <i class="material-icons left">edit</i>
+            Actualizar pelicula
+        </button>
+    </div>
+    <div class="input-field col s10">
+        <a href="/admin/" style="color: #c62828">
+            <i class="material-icons left">cancel</i>
+            Cancelar
+        </a>
+    </div>
+</div>
+</form>
+<%- include('../partials/footer') %>

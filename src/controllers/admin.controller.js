@@ -3,7 +3,6 @@ const db = require('../config/db');
 exports.listarPeliculas = async (req, res) => {
     try {
         const [peliculas] = await db.query('SELECT * FROM Pelicula ORDER BY ID_Pelicula');
-        console.log('Películas obtenidas:', peliculas);
         res.render('admin/peliculas', { peliculas });
     } catch (error) {
         console.error('Error al listar películas:', error);
@@ -18,8 +17,6 @@ exports.formNuevaPelicula = (req, res) => {
 exports.guardarPelicula = async (req, res) => {
     const { nombre, resumen, año, duracion, idioma, director, costo } = req.body;
 
-    console.log('Datos recibidos:', req.body);
-
     // Validar los campos requeridos
     if (!nombre || !resumen || !duracion || !idioma || !director || !costo) {
         return res.status(400).send('Todos los campos son requeridos');
@@ -31,5 +28,24 @@ exports.guardarPelicula = async (req, res) => {
     } catch (error) {
         console.error('Error al guardar la película:', error);
         res.status(500).send('Error al guardar la película en la base de datos');
+    }
+}
+
+exports.formEditarPelicula = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [pelicula] = await db.query('SELECT * FROM Pelicula WHERE ID_Pelicula = ?', [id]);
+
+        console.log('Pelicula:', pelicula[0]);
+
+        if (pelicula.length === 0) {
+            return res.status(404).send('Película no encontrada');
+        }
+
+        res.render('admin/editarPelicula', { pelicula: pelicula[0] });
+    } catch (error) {
+        console.error('Error al obtener la película:', error);
+        res.status(500).send('Error al obtener la película desde la base de datos');
     }
 }

@@ -1,0 +1,60 @@
+<%- include('header') %>
+<h1>Agregar nuevo empleado</h1>
+
+<% if (typeof error !== 'undefined') { %>
+<h4 style="color: #c62828"><%= error %></h4>
+<% } %>
+
+<form action="/admin/empleados/nuevo" method="POST">
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Apellido_P">Apellido paterno:</label>
+      <input type="text" id="Apellido_P" name="Apellido_P" required />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Apellido_M">Apellido Materno:</label>
+      <input type="text" id="Apellido_M" name="Apellido_M" required />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Nombres">Nombres:</label>
+      <input type="text" id="Nombres" name="Nombres" required />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Correo">Correo:</label>
+      <input type="text" id="Correo" name="Correo" required />
+    </div>
+  </div>
+
+<div class="row"></div>
+    <div class="input-field col s12">
+        <label for="Fecha_Nacimiento" class="active">Fecha de Nacimiento:</label>
+        <input type="date" id="Fecha_Nacimiento" name="Fecha_Nacimiento" value="" required />
+    </div>
+</div>
+
+  <div class="row">
+    <div class="input-field col s2">
+      <button type="submit" class="waves-effect waves-teal btn green darken-1"><i
+          class="material-icons left">add</i>Agregar Empleado</button>
+    </div>
+  
+    <div class="input-field col s10">
+      <a href="/admin/empleados" style="color: #c62828">
+        <i class="material-icons left">cancel</i>
+        Cancelar
+      </a>
+    </div>
+  </div>
+
+</form>
+<%- include('../partials/footer') %>

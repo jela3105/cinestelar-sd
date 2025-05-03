@@ -1,0 +1,84 @@
+<%- include('header') %>
+<h1>Editar empleado</h1>
+<% if (typeof error !=='undefined' ) { %>
+<h4 style="color: #c62828"><%= error %></h4>
+<% } %>
+<form action="/admin/empleados/editar/<%= empleado.ID_EMP %>" method="POST">
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Apellido_P">Apellido paterno:</label>
+      <input
+        type="text"
+        id="Apellido_P"
+        name="Apellido_P"
+        value="<%= empleado.Apellido_P %>"
+        required
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Apellido_M">Apellido Materno:</label>
+      <input
+        type="text"
+        id="Apellido_M"
+        name="Apellido_M"
+        value="<%= empleado.Apellido_M %>"
+        required
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Nombres">Nombres:</label>
+      <input
+        type="text"
+        id="Nombres"
+        name="Nombres"
+        value="<%= empleado.Nombres %>"
+        required
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Correo">Correo:</label>
+      <input
+        type="text"
+        id="Correo"
+        name="Correo"
+        value="<%= empleado.Correo %>"
+        required
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="Fecha_Nacimiento" class="active">Fecha de Nacimiento:</label>
+      <input
+        type="date"
+        id="Fecha_Nacimiento"
+        name="Fecha_Nacimiento"
+        value="<%= empleado.Fecha_Nacimiento %>"
+        required
+      />
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-field col s2">
+      <button type="submit" class="waves-effect waves-teal btn yellow darken-1">
+        <i class="material-icons left">edit</i>Actualizar Empleado
+      </button>
+    </div>
+    <div class="input-field col s10">
+      <a href="/admin/empleados" style="color: #c62828">
+        <i class="material-icons left">cancel</i> Cancelar
+      </a>
+    </div>
+  </div>
+</form>
+<%- include('../partials/footer') %>
+<script>
+  document.getElementById("Fecha_Nacimiento").value =
+    "<%= new Date(empleado.Fecha_Nacimiento).toISOString().split('T')[0] %>";
+</script>

@@ -1,0 +1,46 @@
+<%- include('header') %>
+<h1>Empleados</h1>
+<a
+  class="waves-effect waves-teal btn-flat"
+  style="color: #43a047"
+  href="/admin/empleados/nuevo"
+>
+  <i class="material-icons left">add</i>
+  Agregar empleado 
+</a>
+
+<table border="1" cellpadding="5" cellspacing="0">
+  <thead>
+    <tr>
+      <th>Apellido paterno</th>
+      <th>Apellido materno</th>
+      <th>Nombres</th>
+      <th>Correo</th>
+      <th>Fecha Nacimiento</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% empleados.forEach(e=> { %>
+      <td><%= e.Apellido_P %></td>
+      <td><%= e.Apellido_M %></td>
+      <td><%= e.Nombres %></td>
+      <td><%= e.Correo %></td>
+    <td><%= new Date(e.Fecha_Nacimiento).toLocaleDateString('es-MX') %></td>
+      <td>
+        <a href="/admin/empleados/editar/<%= e.ID_EMP %>">
+          <i class="material-icons left">edit</i>
+          Editar
+        </a>
+      </td>
+      <td>
+        <a href="/admin/empleados/eliminar/<%= e.ID_EMP %>" style="color: #c62828">
+          <i class="material-icons left">delete</i>
+          Eliminar
+        </a>
+      </td>
+    </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('../partials/footer') %>

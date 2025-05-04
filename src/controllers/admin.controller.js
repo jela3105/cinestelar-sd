@@ -3,16 +3,12 @@ const db = require('../config/db');
 exports.listarPeliculas = async (req, res) => {
     try {
         const [peliculas] = await db.query('SELECT * FROM Pelicula ORDER BY ID_Pelicula');
-        res.render('admin/peliculas', { peliculas });
+        res.render('admin/peliculas/peliculas', { peliculas });
     } catch (error) {
         console.error('Error al listar películas:', error);
         res.status(500).send('Error al obtener las películas desde la base de datos');
     }
 };
-
-exports.formNuevaPelicula = (req, res) => {
-    res.render('admin/nuevaPelicula');
-}
 
 exports.guardarPelicula = async (req, res) => {
     const { nombre, resumen, año, duracion, idioma, director, costo } = req.body;
@@ -41,7 +37,7 @@ exports.formEditarPelicula = async (req, res) => {
             return res.status(404).send('Película no encontrada');
         }
 
-        res.render('admin/editarPelicula', { pelicula: pelicula[0] });
+        res.render('admin/peliculas/editarPelicula', { pelicula: pelicula[0] });
     } catch (error) {
         console.error('Error al obtener la película:', error);
         res.status(500).send('Error al obtener la película desde la base de datos');
@@ -81,15 +77,11 @@ exports.eliminarPelicula = async (req, res) => {
 exports.listarEmpleados = async (req, res) => {
     try {
         const [empleados] = await db.query('SELECT * FROM Empleados');
-        res.render('admin/empleados', { empleados });
+        res.render('admin/empleados/empleados', { empleados });
     } catch (error) {
         console.error('Error al listar películas:', error);
         res.status(500).send('Error al obtener los empleados desde la base de datos');
     }
-}
-
-exports.formNuevoEmpleado = (req, res) => {
-    res.render('admin/nuevoEmpleado');
 }
 
 exports.guardarEmpleado = async (req, res) => {
@@ -140,7 +132,7 @@ exports.formEditarEmpleado = async (req, res) => {
             return res.status(404).send('Empleado no encontrado');
         }
 
-        res.render('admin/editarEmpleado', { empleado: empleado[0] });
+        res.render('admin/empleados/editarEmpleado', { empleado: empleado[0] });
     } catch (error) {
         console.error('Error al obtener el empleado:', error);
         res.status(500).send('Error al obtener el empleado desde la base de datos');
@@ -195,7 +187,7 @@ exports.listarFunciones = async (req, res) => {
             JOIN Pelicula ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula 
             JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
         `);
-        res.render('admin/funciones', { funciones });
+        res.render('admin/funciones/funciones', { funciones });
     } catch (error) {
         console.error('Error al listar funciones:', error);
         res.status(500).send('Error al obtener las funciones desde la base de datos');

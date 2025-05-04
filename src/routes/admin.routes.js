@@ -7,7 +7,7 @@ const { isAdmin } = require("../middlewares/auth.middleware");
 
 // Películas
 router.get("/", adminController.listarPeliculas);
-router.get("/peliculas/nueva", (req, res) => { res.render("admin/nuevaPelicula"); });
+router.get("/peliculas/nueva", (req, res) => { res.render("admin/peliculas/nuevaPelicula"); });
 router.post('/peliculas/nueva', adminController.guardarPelicula);
 router.get('/peliculas/editar/:id', adminController.formEditarPelicula);
 router.post('/peliculas/editar/:id', adminController.actualizarPelicula);
@@ -15,7 +15,7 @@ router.get('/peliculas/eliminar/:id', adminController.eliminarPelicula);
 
 // Empleados
 router.get('/empleados', adminController.listarEmpleados);
-router.get('/empleados/nuevo', adminController.formNuevoEmpleado);
+router.get('/empleados/nuevo', (req, res) => { res.render("admin/empleados/nuevoEmpleado"); });
 router.post('/empleados/nuevo', adminController.guardarEmpleado);//validar correo no repetido
 router.get('/empleados/editar/:id', adminController.formEditarEmpleado);
 router.post('/empleados/editar/:id', adminController.actualizarEmpleado);//validar correo no repetido

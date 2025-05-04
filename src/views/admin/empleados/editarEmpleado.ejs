@@ -1,4 +1,4 @@
-<%- include('header') %>
+<%- include('../header') %>
 <h1>Editar empleado</h1>
 <% if (typeof error !=='undefined' ) { %>
 <h4 style="color: #c62828"><%= error %></h4>
@@ -77,7 +77,7 @@
     </div>
   </div>
 </form>
-<%- include('../partials/footer') %>
+<%- include('../../partials/footer') %>
 <script>
   document.getElementById("Fecha_Nacimiento").value =
     "<%= new Date(empleado.Fecha_Nacimiento).toISOString().split('T')[0] %>";

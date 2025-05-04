@@ -1,0 +1,76 @@
+<%- include('../header') %>
+
+  <style>
+    .mapa-sala {
+      text-align: center;
+      margin: 20px auto;
+      width: 500px;
+    }
+
+    .pantalla {
+      background: #444;
+      color: white;
+      padding:5px;
+      margin-bottom: 10px;
+    }
+
+    .fila {
+      display: flex;
+      justify-content: center;
+      margin: 5px 0;
+    }
+
+    .asiento {
+      width: 30px;
+      height: 30px;
+      background: #ccc;
+      margin: 3px;
+      line-height: 30px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .pasillo {
+      width: 30px;
+      height: 30px;
+      margin: 3px;
+      background: transparent;
+    }
+  </style>
+
+  <h1>Salas</h1>
+  <a class="waves-effect waves-teal btn-flat" style="color: #43a047" href="/admin/salas/nueva">
+    <i class="material-icons left">add</i>
+    Agregar nueva sala
+  </a>
+
+  <table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+      <tr>
+        <th>Numero</th>
+        <th>Capacidad</th>
+        <th>Mapa</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% salas.forEach(s=> { %>
+        <tr>
+          <td> <%= s.Numero_Sala %> </td>
+          <td> <%= s.Capacidad %> </td>
+          <td><%- s.mapa_html %></td>
+          <td>
+            <a href="/admin/salas/editar/<%= s.ID_Sala %>">
+              <i class="material-icons left">edit</i>
+              Editar
+            </a>
+          </td>
+          <td>
+            <a href="/admin/salas/eliminar/<%= s.ID_Sala %>" style="color: #c62828">
+              <i class="material-icons left">delete</i>
+              Eliminar
+            </a>
+          </td>
+        </tr>
+        <% }) %>
+    </tbody>

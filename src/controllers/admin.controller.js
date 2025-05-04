@@ -182,3 +182,100 @@ exports.eliminarEmpleado = async (req, res) => {
         res.status(500).send('Error al eliminar el empleado de la base de datos');
     }
 }
+
+exports.listarFunciones = async (req, res) => {
+    try {
+        const [funciones] = await db.query(`
+            SELECT 
+                Nombre, 
+                Duración, 
+                Numero_Sala, 
+                Horario 
+            FROM Funcion 
+            JOIN Pelicula ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula 
+            JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
+        `);
+        res.render('admin/funciones', { funciones });
+    } catch (error) {
+        console.error('Error al listar funciones:', error);
+        res.status(500).send('Error al obtener las funciones desde la base de datos');
+    }
+}
+
+exports.listarSalas = async (req, res) => {
+    try {
+        const [salas] = await db.query('SELECT * FROM Sala ORDER BY Numero_Sala');
+        res.render('admin/salas/salas', { salas });
+    } catch (error) {
+        console.error('Error al listar salas:', error);
+        res.status(500).send('Error al obtener las salas desde la base de datos');
+    }
+}
+
+exports.formNuevaSala = (req, res) => {
+    res.render('admin/salas/nuevaSala');
+}
+
+exports.guardarSala = async (req, res) => {
+    const { numero, capacidad, mapa_html } = req.body;
+
+    // Validar los campos requeridos
+    if (!numero || !capacidad || !mapa_html) {
+        return res.status(400).send('Todos los campos son requeridos');
+    }
+
+    try {
+        await db.query('INSERT INTO Sala (Numero_Sala, Capacidad, mapa_html) VALUES (?, ?, ?)', [numero, capacidad, mapa_html]);
+        res.redirect('/admin/salas/salas');
+    } catch (error) {
+        console.error('Error al guardar la sala:', error);
+        res.status(500).send('Error al guardar la sala en la base de datos');
+    }
+}
+
+exports.formEditarSala = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [sala] = await db.query('SELECT * FROM Sala WHERE ID_Sala = ?', [id]);
+
+        if (sala.length === 0) {
+            return res.status(404).send('Sala no encontrada');
+        }
+
+        res.render('admin/salas/editarSala', { sala: sala[0] });
+    } catch (error) {
+        console.error('Error al obtener la sala:', error);
+        res.status(500).send('Error al obtener la sala desde la base de datos');
+    }
+}
+
+exports.actualizarSala = async (req, res) => {
+    const { id } = req.params;
+    const { numero, capacidad, mapa_html } = req.body;
+
+    // Validar los campos requeridos
+    if (!numero || !capacidad || !mapa_html) {
+        return res.status(400).send('Todos los campos son requeridos');
+    }
+
+    try {
+        await db.query('UPDATE Sala SET Numero_Sala = ?, Capacidad = ?, mapa_html = ? WHERE ID_Sala = ?', [numero, capacidad, mapa_html, id]);
+        res.redirect('/admin/salas');
+    } catch (error) {
+        console.error('Error al actualizar la sala:', error);
+        res.status(500).send('Error al actualizar la sala en la base de datos');
+    }
+}
+
+exports.eliminarSala = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await db.query('DELETE FROM Sala WHERE ID_Sala = ?', [id]);
+        res.redirect('/admin/salas');
+    } catch (error) {
+        console.error('Error al eliminar la sala:', error);
+        res.status(500).send('Error al eliminar la sala de la base de datos');
+    }
+}

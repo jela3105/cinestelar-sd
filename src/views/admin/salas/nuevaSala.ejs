@@ -1,0 +1,51 @@
+<%- include('../header') %>
+<h1>Agregar nueva sala</h1>
+
+<% if (typeof error !== 'undefined') { %>
+<h4 style="color: #c62828"><%= error %></h4>
+<% } %>
+
+<form action="/admin/salas/nueva" method="POST">
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="nombre">Numero:</label>
+      <input
+        type="number"
+        id="numero"
+        name="numero"
+        class="input-field"
+        required
+      />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="mapa_html">Mapa HTML:</label>
+      <textarea id="mapa_html" class="materialize-textarea" name="mapa_html" required></textarea>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">
+      <label for="capacidad">Capacidad:</label>
+      <input type="number" id="capacidad" name="capacidad" required />
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="input-field col s2">
+      <button type="submit" class="waves-effect waves-teal btn green darken-1"><i
+          class="material-icons left">add</i>Agregar sala</button>
+    </div>
+  
+    <div class="input-field col s10">
+      <a href="/admin/salas" style="color: #c62828">
+        <i class="material-icons left">cancel</i>
+        Cancelar
+      </a>
+    </div>
+  </div>
+
+</form>
+<%- include('../../partials/footer') %>

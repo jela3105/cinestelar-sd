@@ -86,11 +86,18 @@ exports.comprar = async (req, res) => {
 
 exports.reservar = async (req, res) => {
     const { funcionId, asientos } = req.body;
-    console.log(asientos, funcionId)
+
+    let connection; // Variable para almacenar la conexión
 
     try {
+        // Obtener una conexión del pool
+        connection = await db.getConnection();
+
+        // Iniciar la transacción
+        await connection.beginTransaction();
+
         // Verificar si la función existe
-        const [funcion] = await db.query(`
+        const [funcion] = await connection.query(`
             SELECT 
                 Funcion.ID_Funcion, 
                 Sala.Capacidad
@@ -105,12 +112,50 @@ exports.reservar = async (req, res) => {
             return res.status(404).send('Función no encontrada');
         }
 
-        // Verificar si los asientos están disponibles
+        // Convertir los asientos en tuplas de fila y número
+        const asientosProcesados = asientos.map(asiento => {
+            const fila = asiento.slice(0, 1); // Extraer la letra (fila)
+            const numero = asiento.slice(1); // Extraer el número
+            return { fila, numero };
+        });
 
+        // Verificar si los asientos están disponibles
+        for (const asiento of asientosProcesados) {
+            const { fila, numero } = asiento;
+            console.log(fila, numero);
+            const [rows] = await connection.query(`
+                SELECT COUNT(*) AS count
+                FROM Detalle_Ticket
+                JOIN Ticket ON Detalle_Ticket.Ticket_ID_Ticket = Ticket.ID_Ticket
+                WHERE Funcion_ID_Funcion = ? AND Fila = ? AND Numero = ?`,
+                [funcionId, fila, numero]
+            );
+
+            if (rows[0].count > 0) {
+                throw new Error(`El asiento ${fila}${numero} ya está reservado`);
+            }
+        }
+
+        // Insertar el ticket y los detalles de los asientos
+        const [result] = await connection.query(`INSERT INTO Ticket (Funcion_ID_Funcion) VALUES (?)`, [funcionId]);
+        const ticketId = result.insertId;
+        console.log(ticketId);
+
+        for (const asiento of asientosProcesados) {
+            const { fila, numero } = asiento;
+            await connection.query(`INSERT INTO Detalle_Ticket (Ticket_ID_Ticket, Fila, Numero) VALUES (?, ?, ?)`, [ticketId, fila, numero]);
+        }
+
+        // Confirmar la transacción
+        await connection.commit();
         res.status(200).json({ message: 'Asientos reservados con éxito' });
-    }
-    catch (err) {
+    } catch (err) {
+        // Revertir la transacción en caso de error
+        if (connection) await connection.rollback();
         console.error('Error al reservar asientos:', err);
-        res.status(500).send('Error al reservar asientos');
+        res.status(500).json({ message: err.message });
+    } finally {
+        // Liberar la conexión
+        if (connection) connection.release();
     }
-}
+};

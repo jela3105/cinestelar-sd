@@ -1,3 +1,169 @@
 <%- include('../header') %>
+<h1>Funciones disponibles</h1>
+<a class="waves-effect waves-teal btn-flat" style="color: #43a047" href="/admin/funciones/nueva">
+    <i class="material-icons left">add</i>
+    Agregar nueva funcion
+</a>
+
+<a class="waves-effect waves-teal btn-flat" style="color: #43a047" href="/admin/funciones/nueva">
+    <i class="material-icons left">content_copy</i>
+    Copiar funciones para el dia <%= new Date(Date.now() + 86400000).toLocaleDateString('es-ES', {
+        day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '') %>
+</a>
+
+<div class="input-field">
+    <input type="text" class="datepicker" id="fecha" name="fecha">
+    <label for="fecha">Seleccione una fecha</label>
+</div>
+
+<!-- Tabla para mostrar las funciones -->
+<table class="highlight centered">
+    <thead>
+        <tr>
+            <th>Película</th>
+            <th>Duración</th>
+            <th>Sala</th>
+            <th>Horario</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="tabla-funciones">
+        <% funciones.forEach(funcion => { %>
+            <tr>
+                <td><%= funcion.Nombre %></td>
+                <td><%= funcion.Duración %></td>
+                <td><%= funcion.Numero_Sala %></td>
+                <td>
+                    <% 
+                        const fecha = new Date(funcion.Horario);
+                        const dia = fecha.getDate().toString().padStart(2, '0');
+                        const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                        const mes = meses[fecha.getMonth()];
+                        const anio = fecha.getFullYear();
+                        const hora = fecha.getHours().toString().padStart(2, '0');
+                        const minutos = fecha.getMinutes().toString().padStart(2, '0');
+                        const horarioFormateado = `${dia}/${mes}/${anio} ${hora}:${minutos}`;
+                    %>
+                    <%= horarioFormateado %>
+                </td>
+                <td>
+                    <a class="btn-flat blue-text darken-4" href="/admin/funciones/editar/<%= funcion.ID_Funcion %>">
+                        Editar
+                        <i class="material-icons left">edit</i>
+                    </a>
+                    <button class="btn-flat" style="color: #c62828" onclick="eliminarFuncion('<%= funcion.ID_Funcion %>')">
+                        <i class="material-icons left">delete</i>
+                        Eliminar
+                    </button>
+                </td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>
 
 <%- include('../../partials/footer') %>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar Datepicker
+        const elems = document.querySelectorAll('.datepicker');
+        const datepickerInstances = M.Datepicker.init(elems, {
+            format: 'dd/mmm/yyyy', // Formato de fecha: dd/mmm/aaaa
+            defaultDate: new Date(), // Fecha predeterminada: hoy
+            setDefaultDate: true, // Establecer la fecha predeterminada automáticamente
+            i18n: {
+                cancel: 'Cancelar',
+                clear: 'Limpiar',
+                done: 'Aceptar',
+                months: [
+                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ],
+                monthsShort: [
+                    'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                    'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+                ],
+                weekdays: [
+                    'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+                ],
+                weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                weekdaysAbbrev: ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+            },
+            onSelect: function (selectedDate) {
+                actualizarTablaFunciones(selectedDate);
+            }
+        });
+
+        // Función para actualizar la tabla de funciones
+        function actualizarTablaFunciones(selectedDate) {
+            // Formatear la fecha seleccionada a 'yyyy-mm-dd'
+            const dia = selectedDate.getDate().toString().padStart(2, '0');
+            const mes = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+            const anio = selectedDate.getFullYear();
+            const fechaFormateada = `${anio}-${mes}-${dia}`;
+
+            // Hacer un GET a la ruta con la fecha seleccionada
+            fetch(`/admin/funciones/listarPorFecha?fecha=${fechaFormateada}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tablaFunciones = document.getElementById('tabla-funciones');
+                    tablaFunciones.innerHTML = ''; // Limpiar la tabla antes de llenarla
+
+                    // Llenar la tabla con los datos obtenidos
+                    data.forEach(funcion => {
+                        const fila = document.createElement('tr');
+                        fila.innerHTML = `
+                            <td>${funcion.Nombre}</td>
+                            <td>${funcion.Duración}</td>
+                            <td>${funcion.Numero_Sala}</td>
+                            <td>${new Date(funcion.Horario).toLocaleString('es-ES', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            }).replace(',', '')}</td>
+                            <td>
+                                <a class="btn-flat blue-text darken-4" href="/admin/funciones/editar/${funcion.ID_Funcion}">
+                                    Editar
+                                    <i class="material-icons left">edit</i>
+                                </a>
+                                <button class="btn-flat" style="color: #c62828" onclick="eliminarFuncion('${funcion.ID_Funcion}')">
+                                    <i class="material-icons left">delete</i>
+                                    Eliminar
+                                </button>
+                            </td>
+                        `;
+                        tablaFunciones.appendChild(fila);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al consultar las funciones:', error);
+                });
+        }
+
+        // Función para eliminar una función
+        window.eliminarFuncion = function (idFuncion) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta función?')) {
+                fetch(`/admin/funciones/eliminar/${idFuncion}`, {
+                    method: 'GET'
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Función eliminada correctamente');
+                            // Llamar a la función para actualizar la tabla con la fecha seleccionada
+                            const selectedDate = datepickerInstances[0].date; // Obtener la fecha seleccionada del Datepicker
+                            actualizarTablaFunciones(selectedDate);
+                        } else {
+                            alert('Error al eliminar la función');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al eliminar la función:', error);
+                        alert('Error al eliminar la función');
+                    });
+            }
+        };
+    });
+</script>

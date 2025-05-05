@@ -1,0 +1,116 @@
+<%- include('../header') %>
+<h1>Editar funcion</h1>
+
+<form action="/admin/funciones/editar/<%= funcion.ID_Funcion%>" method="POST">
+
+    <div class="row">
+        <div class="input-field col s4">
+            <input type="text" class="datepicker" id="fecha" name="fecha">
+            <label for="fecha">Seleccione una fecha</label>
+        </div>
+
+        <div class="input-field col s4">
+            <input type="text" class="timepicker" id="hora" name="hora" value="<%= new Date( funcion.Horario ).toTimeString().slice(0, 5) %>">
+            <label for="hora">Seleccione una hora</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="input-field col s4">
+            <select name="pelicula" required>
+                <% peliculas.forEach(pelicula => { %>
+                    <option value="<%= pelicula.ID_Pelicula %>"
+                        <% if (pelicula.ID_Pelicula == funcion.Pelicula_ID_Pelicula) { %>
+                            selected
+                        <% } %>
+                    >
+                        <%= pelicula.Nombre %>
+                    </option>
+                <% }) %>
+            </select>
+            <label>Seleccione la pelicula</label>
+        </div>
+
+        <div class="input-field col s4">
+            <select name="sala" required>
+                <% salas.forEach(sala => { %>
+                    <option value="<%= sala.ID_Sala %>"
+                        <% if (sala.ID_Sala == funcion.Sala_ID_Sala) { %>
+                            selected
+                        <% } %>
+                    >
+                        <%= sala.Numero_Sala %>
+                    </option>
+                <% }) %>
+            </select>
+            <label>Seleccione la Sala</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="input-field col s2">
+            <button type="submit" class="waves-effect waves-teal btn green darken-1">
+                <i class="material-icons left">add</i>Editar funcion
+            </button>
+        </div>
+
+        <div class="input-field col s10">
+            <a href="/admin/funciones" style="color: #c62828">
+                <i class="material-icons left">cancel</i>
+                Cancelar
+            </a>
+        </div>
+    </div>
+
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Obtener la fecha de funcion.Horario y convertirla a un objeto Date
+        const horarioFuncion = new Date('<%= funcion.Horario %>');
+
+        // Inicializar Datepicker
+        const elems = document.querySelectorAll('.datepicker');
+        M.Datepicker.init(elems, {
+            format: 'dd/mmm/yyyy', // Formato de fecha: dd/mmm/aaaa
+            defaultDate: horarioFuncion, // Fecha predeterminada: funcion.Horario
+            setDefaultDate: true, // Establecer la fecha predeterminada
+            i18n: {
+                cancel: 'Cancelar',
+                clear: 'Limpiar',
+                done: 'Aceptar',
+                months: [
+                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ],
+                monthsShort: [
+                    'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                    'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+                ],
+                weekdays: [
+                    'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+                ],
+                weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                weekdaysAbbrev: ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+            }
+        });
+
+        // Inicializar Select
+        const selectElems = document.querySelectorAll('select');
+        M.FormSelect.init(selectElems);
+
+        // Inicializar Timepicker
+        const timeElems = document.querySelectorAll('.timepicker');
+        M.Timepicker.init(timeElems, {
+            twelveHour: false, // Formato de 24 horas
+            defaultTime: horarioFuncion.toTimeString().slice(0, 5), // Hora predeterminada
+            i18n: {
+                cancel: 'Cancelar',
+                clear: 'Limpiar',
+                done: 'Aceptar'
+            }
+        });
+    });
+</script>
+
+<%- include('../../partials/footer') %>

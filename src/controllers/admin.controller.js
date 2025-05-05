@@ -1,5 +1,25 @@
 const db = require('../config/db');
 
+// Función reutilizable para calcular el horario
+const calcularHorario = (fecha, hora) => {
+    // Convertir '04/May/2025' a '2025-05-04'
+    const convertirFecha = (fecha) => {
+        const partes = fecha.split('/');
+        const dia = partes[0];
+        const mes = {
+            Ene: '01', Feb: '02', Mar: '03', Abr: '04', May: '05', Jun: '06',
+            Jul: '07', Ago: '08', Sep: '09', Oct: '10', Nov: '11', Dic: '12'
+        }[partes[1]];
+        const anio = partes[2];
+        return `${anio}-${mes}-${dia}`;
+    };
+
+    const fechaISO = convertirFecha(fecha); // Convertir la fecha al formato ISO
+    const [horaStr, minutosStr] = hora.split(':');
+    const horario = `${fechaISO} ${horaStr}:${minutosStr}:00`; // Formato final
+    return horario;
+};
+
 exports.listarPeliculas = async (req, res) => {
     try {
         const [peliculas] = await db.query('SELECT * FROM Pelicula ORDER BY ID_Pelicula');
@@ -175,25 +195,6 @@ exports.eliminarEmpleado = async (req, res) => {
     }
 }
 
-exports.listarFunciones = async (req, res) => {
-    try {
-        const [funciones] = await db.query(`
-            SELECT 
-                Nombre, 
-                Duración, 
-                Numero_Sala, 
-                Horario 
-            FROM Funcion 
-            JOIN Pelicula ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula 
-            JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
-        `);
-        res.render('admin/funciones/funciones', { funciones });
-    } catch (error) {
-        console.error('Error al listar funciones:', error);
-        res.status(500).send('Error al obtener las funciones desde la base de datos');
-    }
-}
-
 exports.listarSalas = async (req, res) => {
     try {
         const [salas] = await db.query('SELECT * FROM Sala ORDER BY Numero_Sala');
@@ -269,5 +270,138 @@ exports.eliminarSala = async (req, res) => {
     } catch (error) {
         console.error('Error al eliminar la sala:', error);
         res.status(500).send('Error al eliminar la sala de la base de datos');
+    }
+}
+
+exports.listarFunciones = async (req, res) => {
+    try {
+        const [funciones] = await db.query(`
+            SELECT 
+                ID_Funcion,
+                Nombre, 
+                Duración, 
+                Numero_Sala, 
+                Horario 
+            FROM Funcion 
+            JOIN Pelicula ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula 
+            JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
+            WHERE DATE(Horario) = CURDATE() -- Solo funciones de la fecha actual
+            ORDER BY Funcion.Horario
+        `);
+        res.render('admin/funciones/funciones', { funciones });
+    } catch (error) {
+        console.error('Error al listar funciones:', error);
+        res.status(500).send('Error al obtener las funciones desde la base de datos');
+    }
+}
+
+exports.formNuevaFuncion = async (req, res) => {
+    try {
+        const [peliculas] = await db.query('SELECT ID_Pelicula, Nombre, Duración, Costo FROM Pelicula');
+        const [salas] = await db.query('SELECT ID_Sala, Numero_Sala FROM Sala');
+        res.render('admin/funciones/nuevaFuncion', { peliculas, salas });
+    } catch (error) {
+        console.error('Error al obtener películas o salas:', error);
+        res.status(500).send('Error al obtener películas o salas desde la base de datos');
+    }
+}
+
+exports.guardarFuncion = async (req, res) => {
+    const { pelicula, sala, fecha, hora } = req.body;
+
+    console.log(req.body);
+
+    // Validar los campos requeridos
+    if (!pelicula || !sala || !hora || !fecha) {
+        return res.status(400).send('Todos los campos son requeridos');
+    }
+
+    const horario = calcularHorario(fecha, hora); // Calcular el horario
+    console.log('Horario:', horario);
+
+    try {
+        await db.query('INSERT INTO Funcion (Pelicula_ID_Pelicula, Sala_ID_Sala, Horario) VALUES (?, ?, ?)', [pelicula, sala, horario]);
+        res.redirect('/admin/funciones');
+    } catch (error) {
+        console.error('Error al guardar la función:', error);
+        res.status(500).send('Error al guardar la función en la base de datos');
+    }
+}
+
+exports.listarFuncionesPorFecha = async (req, res) => {
+    const { fecha } = req.query;
+
+    try {
+        const [funciones] = await db.query(`
+            SELECT 
+                ID_Funcion,
+                Nombre, 
+                Duración, 
+                Numero_Sala, 
+                Horario 
+            FROM Funcion 
+            JOIN Pelicula ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula 
+            JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
+            WHERE DATE(Horario) = ? -- Funciones de la fecha seleccionada
+            ORDER BY Funcion.Horario
+        `, [fecha]);
+
+        res.status(200).json(funciones);
+    } catch (error) {
+        console.error('Error al listar funciones:', error);
+        res.status(500).send('Error al obtener las funciones desde la base de datos');
+    }
+}
+
+exports.formEditarFuncion = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const [funcion] = await db.query('SELECT * FROM Funcion WHERE ID_Funcion = ?', [id]);
+
+        if (funcion.length === 0) {
+            return res.status(404).send('Función no encontrada');
+        }
+
+        const [peliculas] = await db.query('SELECT ID_Pelicula, Nombre, Duración, Costo FROM Pelicula');
+        const [salas] = await db.query('SELECT ID_Sala, Numero_Sala FROM Sala');
+
+        res.render('admin/funciones/editarFuncion', { funcion: funcion[0], peliculas, salas });
+    } catch (error) {
+        console.error('Error al obtener la función:', error);
+        res.status(500).send('Error al obtener la función desde la base de datos');
+    }
+}
+
+exports.actualizarFuncion = async (req, res) => {
+    const { id } = req.params;
+    const { pelicula, sala, fecha, hora } = req.body;
+
+    // Validar los campos requeridos
+    if (!pelicula || !sala || !hora || !fecha) {
+        return res.status(400).send('Todos los campos son requeridos');
+    }
+
+    const horario = calcularHorario(fecha, hora); // Calcular el horario
+    console.log('Horario:', horario);
+
+    try {
+        await db.query('UPDATE Funcion SET Pelicula_ID_Pelicula = ?, Sala_ID_Sala = ?, Horario = ? WHERE ID_Funcion = ?', [pelicula, sala, horario, id]);
+        res.redirect('/admin/funciones');
+    } catch (error) {
+        console.error('Error al actualizar la función:', error);
+        res.status(500).send('Error al actualizar la función en la base de datos');
+    }
+}
+
+exports.eliminarFuncion = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await db.query('DELETE FROM Funcion WHERE ID_Funcion = ?', [id]);
+        res.status(200).send('Función eliminada correctamente');
+    } catch (error) {
+        console.error('Error al eliminar la función:', error);
+        res.status(500).send('Error al eliminar la función de la base de datos');
     }
 }

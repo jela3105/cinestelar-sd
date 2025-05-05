@@ -23,13 +23,12 @@ router.get('/empleados/eliminar/:id', adminController.eliminarEmpleado);
 
 // Funciones
 router.get('/funciones', adminController.listarFunciones);
-/*
 router.get('/funciones/nueva', adminController.formNuevaFuncion);
 router.post('/funciones/nueva', adminController.guardarFuncion);
+router.get('/funciones/listarPorFecha', adminController.listarFuncionesPorFecha);
 router.get('/funciones/editar/:id', adminController.formEditarFuncion);
 router.post('/funciones/editar/:id', adminController.actualizarFuncion);
-router.post('/funciones/eliminar/:id', adminController.eliminarFuncion);
-*/
+router.get('/funciones/eliminar/:id', adminController.eliminarFuncion);
 
 // Salas
 router.get('/salas', adminController.listarSalas);

@@ -1,0 +1,113 @@
+<%- include('../header') %>
+<h1>Agregar nueva funcion</h1>
+
+<form action="/admin/funciones/nueva" method="POST">
+
+    <div class="row">
+        <div class="input-field col s4">
+            <input type="text" class="datepicker" id="fecha" name="fecha">
+            <label for="fecha">Seleccione una fecha</label>
+        </div>
+
+        <div class="input-field col s4">
+            <input type="text" class="timepicker" id="hora" name="hora">
+            <label for="hora">Seleccione una hora</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="input-field col s4">
+            <select name="pelicula" required>
+                <option value="" disabled selected>Pelicula</option>
+                <% peliculas.forEach(pelicula => { %>
+                    <option value="<%= pelicula.ID_Pelicula %>">
+                        <%= pelicula.Nombre %>
+                    </option>
+                <% }) %>
+            </select>
+            <label>Seleccione la pelicula</label>
+        </div>
+
+        <div class="input-field col s4">
+            <select name="sala" required>
+                <option value="" disabled selected>Sala</option>
+                <% salas.forEach(sala => { %>
+                    <option value="<%= sala.ID_Sala %>">
+                        <%= sala.Numero_Sala %>
+                    </option>
+                <% }) %>
+            </select>
+            <label>Seleccione la Sala</label>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="input-field col s2">
+            <button type="submit" class="waves-effect waves-teal btn green darken-1">
+                <i class="material-icons left">add</i>Agregar funcion
+            </button>
+        </div>
+
+        <div class="input-field col s10">
+            <a href="/admin/funciones" style="color: #c62828">
+                <i class="material-icons left">cancel</i>
+                Cancelar
+            </a>
+        </div>
+    </div>
+
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Inicializar Datepicker
+        const elems = document.querySelectorAll('.datepicker');
+        M.Datepicker.init(elems, {
+            format: 'dd/mmm/yyyy', // Formato de fecha: dd/mmm/aaaa
+            defaultDate: new Date(), // Fecha predeterminada: hoy
+            setDefaultDate: true, // Establecer la fecha predeterminada automáticamente
+            i18n: {
+                cancel: 'Cancelar',
+                clear: 'Limpiar',
+                done: 'Aceptar',
+                months: [
+                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ],
+                monthsShort: [
+                    'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                    'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+                ],
+                weekdays: [
+                    'Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'
+                ],
+                weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+                weekdaysAbbrev: ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+            },
+            onSelect: function (selectedDate) {
+                // Formatear la fecha seleccionada a 'yyyy-mm-dd'
+                const dia = selectedDate.getDate().toString().padStart(2, '0');
+                const mes = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+                const anio = selectedDate.getFullYear();
+                const fechaFormateada = `${anio}-${mes}-${dia}`;
+            }
+        });
+
+        // Inicializar Select
+        const selectElems = document.querySelectorAll('select');
+        M.FormSelect.init(selectElems);
+
+        // Inicializar Timepicker
+        const timeElems = document.querySelectorAll('.timepicker');
+        M.Timepicker.init(timeElems, {
+            twelveHour: false, // Formato de 24 horas
+            i18n: {
+                cancel: 'Cancelar',
+                clear: 'Limpiar',
+                done: 'Aceptar'
+            }
+        });
+    });
+</script>
+
+<%- include('../../partials/footer') %>

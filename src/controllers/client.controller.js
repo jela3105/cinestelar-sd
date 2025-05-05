@@ -65,8 +65,18 @@ exports.comprar = async (req, res) => {
             return res.status(404).send('Función no encontrada');
         }
 
+        const [asientos] = await db.query(`
+            SELECT CONCAT(Fila, Numero) AS Asiento
+	        FROM Detalle_Ticket
+	        JOIN Ticket ON Detalle_Ticket.Ticket_ID_Ticket = Ticket.ID_Ticket
+	        WHERE Funcion_ID_Funcion = ?;`,
+            [funcionId]);
+
+        // Convertir los asientos reservados a un formato más manejable
+        const asientosReservados = asientos.map(asiento => asiento.Asiento);
+
         // Renderizar la vista de compra con los detalles de la función
-        res.render('client/comprar', { funcion: funcion[0], asientosReservados: ['B1'] });
+        res.render('client/comprar', { funcion: funcion[0], asientosReservados });
     }
     catch (err) {
         console.error('Error al cargar función:', err);

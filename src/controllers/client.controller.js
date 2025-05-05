@@ -10,6 +10,7 @@ exports.verCartelera = async (req, res) => {
       FROM Pelicula
       JOIN Funcion ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula
       JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
+      WHERE DATE(Funcion.Horario) = CURDATE()
       ORDER BY Funcion.Horario
     `);
 
@@ -26,9 +27,8 @@ exports.verCartelera = async (req, res) => {
             }
             cartelera[id].funciones.push({
                 id_funcion: row.ID_Funcion,
-                fecha: row.Fecha,
-                hora: row.Hora,
-                sala: row.SalaNombre
+                sala: row.Numero_Sala,
+                horario: row.Horario
             });
         });
 
@@ -38,3 +38,69 @@ exports.verCartelera = async (req, res) => {
         res.status(500).send('Error al mostrar cartelera');
     }
 };
+
+exports.comprar = async (req, res) => {
+    const { funcionId } = req.params;
+
+    try {
+        // Verificar si la función existe
+        const [funcion] = await db.query(`
+            SELECT 
+                Funcion.ID_Funcion, 
+                Funcion.Horario,
+                Pelicula.Nombre, 
+                Pelicula.Costo,
+                Sala.Numero_Sala, 
+                Sala.Capacidad,
+                Sala.mapa_html
+            FROM Funcion
+            JOIN Pelicula ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula
+            JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
+            WHERE Funcion.ID_Funcion = ?
+            `,
+            [funcionId]
+        );
+
+        if (funcion.length === 0) {
+            return res.status(404).send('Función no encontrada');
+        }
+
+        // Renderizar la vista de compra con los detalles de la función
+        res.render('client/comprar', { funcion: funcion[0], asientosReservados: ['B1'] });
+    }
+    catch (err) {
+        console.error('Error al cargar función:', err);
+        res.status(500).send('Error al cargar función');
+    }
+}
+
+exports.reservar = async (req, res) => {
+    const { funcionId, asientos } = req.body;
+    console.log(asientos, funcionId)
+
+    try {
+        // Verificar si la función existe
+        const [funcion] = await db.query(`
+            SELECT 
+                Funcion.ID_Funcion, 
+                Sala.Capacidad
+            FROM Funcion
+            JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
+            WHERE Funcion.ID_Funcion = ?
+            `,
+            [funcionId]
+        );
+
+        if (funcion.length === 0) {
+            return res.status(404).send('Función no encontrada');
+        }
+
+        // Verificar si los asientos están disponibles
+
+        res.status(200).json({ message: 'Asientos reservados con éxito' });
+    }
+    catch (err) {
+        console.error('Error al reservar asientos:', err);
+        res.status(500).send('Error al reservar asientos');
+    }
+}

@@ -1,0 +1,138 @@
+<%- include('header') %>
+
+ <style>
+    .pantalla {
+      background: #444;
+      color: white;
+      padding: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .fila {
+      display: flex;
+      justify-content: center;
+      margin: 5px 0;
+    }
+
+    .asiento {
+      width: 50px;
+      height: 50px;
+      background: #f9f9f9;
+      margin: 3px;
+      line-height: 30px;
+      text-align: center;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      user-select: none;
+      border: 2px solid #ccc;
+    }
+
+    .asiento.seleccionado {
+      background-color: #1565c0;
+      color: white;
+    }
+
+    .asiento.reservado {
+      background-color: #bbb;
+      cursor: not-allowed;
+    }
+
+    .pasillo {
+      width: 30px;
+      height: 30px;
+      margin: 3px;
+      background: transparent;
+    }
+
+    #confirmar-asientos {
+      margin-top: 20px;
+      padding: 8px 16px;
+      font-size: 16px;
+    }
+  </style>
+
+<h1>Compra de boletos</h1>
+<h6><strong>Película: </strong><%= funcion.Nombre %></h6>
+           <%  
+              const fecha = new Date(funcion.Horario);
+              const dia = fecha.getDate().toString().padStart(2, '0');
+              const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+              const mes = meses[fecha.getMonth()];
+              const anio = fecha.getFullYear();
+              const hora = fecha.getHours().toString().padStart(2, '0');
+              const minutos = fecha.getMinutes().toString().padStart(2, '0');
+              const horarioFormateado = `${hora}:${minutos}`;
+            %>
+
+<h6><strong>Hora: </strong> <%= horarioFormateado %></h6>
+<h6 id="total"><strong>Total: </strong> $0 MXN</h6>
+
+<div class="container">
+
+<%- funcion.mapa_html %>
+</div>
+
+  <button id="confirmar-asientos">Confirmar selección</button>
+
+ <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const asientosReservados = <%- JSON.stringify(asientosReservados) %>;
+        const asientos = document.querySelectorAll('.asiento');
+        const costoPorAsiento = <%= funcion.Costo %>; // Obtener el costo de la función
+        const totalElement = document.getElementById('total'); // Elemento para mostrar el total
+
+        // Función para actualizar el total
+        const actualizarTotal = () => {
+            const seleccionados = document.querySelectorAll('.asiento.seleccionado').length;
+            const total = seleccionados * costoPorAsiento;
+            totalElement.innerHTML = `<strong>Total: </strong> $${total} MXN`;
+        };
+
+        asientos.forEach(asiento => {
+            const id = asiento.dataset.asiento;
+
+            // Marcar como reservado
+            if (asientosReservados.includes(id)) {
+                asiento.classList.add('reservado');
+                asiento.style.pointerEvents = 'none';
+            } else {
+                // Permitir selección solo si no está reservado
+                asiento.addEventListener('click', () => {
+                    asiento.classList.toggle('seleccionado');
+                    actualizarTotal(); // Actualizar el total al seleccionar o deseleccionar
+                });
+            }
+        });
+
+        document.getElementById('confirmar-asientos').addEventListener('click', async () => {
+            const seleccionados = Array.from(document.querySelectorAll('.asiento.seleccionado'))
+                                       .map(a => a.dataset.asiento);
+
+            if (seleccionados.length === 0) {
+                alert('Selecciona al menos un asiento disponible');
+                return;
+            }
+
+            try {
+                const funcionId = <%- funcion.ID_Funcion %>;
+                const res = await fetch('/reservar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ funcionId, asientos: seleccionados })
+                });
+
+                const data = await res.json();
+                alert(data.message || 'Asientos reservados');
+                // Redirigir a la página de funciones
+                window.location.href = '/';
+            } catch (err) {
+                console.error(err);
+                alert('Error al reservar los asientos');
+            }
+        });
+    });
+  </script>

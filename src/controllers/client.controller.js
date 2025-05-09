@@ -87,6 +87,9 @@ exports.comprar = async (req, res) => {
 exports.reservar = async (req, res) => {
     const { funcionId, asientos } = req.body;
 
+    setTimeout(() => {
+    }, process.env.BUY_DELAY);
+
     let connection; // Variable para almacenar la conexión
 
     try {
@@ -148,7 +151,7 @@ exports.reservar = async (req, res) => {
 
         // Confirmar la transacción
         await connection.commit();
-        res.status(200).json({ message: 'Asientos reservados con éxito' });
+        res.status(200).json({ message: 'Asientos reservados con éxito, ticket numero' + ticketId });
     } catch (err) {
         // Revertir la transacción en caso de error
         if (connection) await connection.rollback();

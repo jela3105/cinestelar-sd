@@ -4,16 +4,35 @@
 <head>
   <meta charset="UTF-8" />
   <title>Cinestelar admin</title>
-
   <!--Import Google Icon Font-->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
   <!-- Compiled and minified CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-
   <!-- Compiled and minified JavaScript -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js">
+  </script>
+  <style>
+    .datepicker-date-display {
+      background-color: #0d47a1;
+    }
 
+    .datepicker-cancel,
+    .datepicker-clear,
+    .datepicker-today,
+    .datepicker-done,
+    .timepicker-cancel {
+      color: #0d47a1;
+    }
+
+    .datepicker-table td.is-today {
+      color: #0d47a1;
+    }
+
+    .datepicker-table td.is-selected {
+      background-color: #0d47a1;
+      color: #fff;
+    }
+  </style>
 </head>
 
 <body>
@@ -30,4 +49,4 @@
     </nav>
   </header>
   <main>
-   <div style="margin: 50px;">
+    <div style="margin: 50px;">

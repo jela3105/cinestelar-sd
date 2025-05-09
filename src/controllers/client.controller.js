@@ -162,3 +162,79 @@ exports.reservar = async (req, res) => {
         if (connection) connection.release();
     }
 };
+
+
+exports.detalleTicket = async (req, res) => {
+    const { ticketId } = req.body;
+
+    try {
+        // Obtener los detalles del ticket
+        const [ticket] = await db.query(`
+            SELECT 
+                Ticket.ID_Ticket, 
+                Funcion.Horario,
+                Pelicula.Nombre, 
+                Sala.Numero_Sala,
+                Detalle_Ticket.Fila,
+                Detalle_Ticket.Numero
+            FROM Ticket
+            JOIN Funcion ON Ticket.Funcion_ID_Funcion = Funcion.ID_Funcion
+            JOIN Pelicula ON Funcion.Pelicula_ID_Pelicula = Pelicula.ID_Pelicula
+            JOIN Sala ON Funcion.Sala_ID_Sala = Sala.ID_Sala
+            JOIN Detalle_Ticket ON Ticket.ID_Ticket = Detalle_Ticket.Ticket_ID_Ticket
+            WHERE Ticket.ID_Ticket = ?
+        `, [ticketId]);
+
+        if (ticket.length === 0) {
+            return res.status(404).send('Ticket no encontrado');
+        }
+
+        console.log(ticket);
+        res.render('client/detalle-ticket', { ticket: ticket });
+    } catch (err) {
+        console.error('Error al cargar ticket:', err);
+        res.status(500).send('Error al cargar ticket');
+    }
+}
+
+exports.cancelarTicket = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Obtener una conexión del pool
+        const connection = await db.getConnection();
+
+        // Iniciar la transacción
+        await connection.beginTransaction();
+
+        // Verificar si el ticket existe
+        const [ticket] = await connection.query(`
+            SELECT ID_Ticket
+            FROM Ticket
+            WHERE ID_Ticket = ?
+        `, [id]);
+
+        if (ticket.length === 0) {
+            return res.status(404).send('Ticket no encontrado');
+        }
+
+        // Eliminar los detalles del ticket
+        await connection.query(`
+            DELETE FROM Detalle_Ticket
+            WHERE Ticket_ID_Ticket = ?
+        `, [id]);
+
+        // Eliminar el ticket
+        await connection.query(`
+            DELETE FROM Ticket
+            WHERE ID_Ticket = ?
+        `, [id]);
+
+        // Confirmar la transacción
+        await connection.commit();
+        res.redirect('/');
+    } catch (err) {
+        console.error('Error al cancelar ticket:', err);
+        res.status(500).json({ message: 'Error al cancelar ticket' });
+    }
+}

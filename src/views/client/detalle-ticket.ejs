@@ -1,0 +1,53 @@
+<%- include('header') %>
+
+<div class="container">
+  <div class="row">
+    <div class="col s12 m6 offset-m3">
+      <h4 class="center-align">Detalles del Ticket</h4>
+
+      <p>
+        <strong>Pelicula: </strong>
+        <%= ticket[0].Nombre %>
+      </p>
+      <p>
+        <strong>Horario: </strong>
+        <% 
+          const fecha = new Date(ticket[0].Horario);
+          const dia = fecha.getDate().toString().padStart(2, '0');
+          const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+          const mes = meses[fecha.getMonth()];
+          const anio = fecha.getFullYear();
+          const hora = fecha.getHours().toString().padStart(2, '0');
+          const minutos = fecha.getMinutes().toString().padStart(2, '0');
+          const horarioFormateado = `${dia}/${mes}/${anio} ${hora}:${minutos}`;
+        %>
+        <%= horarioFormateado %>
+      </p>
+      <p>
+        <strong>Sala: </strong>
+        <%= ticket[0].Numero_Sala %>
+      </p>
+      <p><strong>Asientos reservados: </strong></p>
+
+      <% for( t of ticket ) { %>
+      <p>
+        <strong>- </strong>
+        <%= t.Fila %><%= t.Numero %> 
+      </p>
+      <% } %>
+      <!-- Botón para volver a la página principal -->
+      <a href="/" class="btn waves-effect waves-light blue darken-4"
+        >Volver a la página principal</a
+      >
+
+      <!-- Botón para cancelar ticket-->
+      <a
+        href="/ticket/cancel/<%= ticket[0].ID_Ticket %>"
+        class="btn-flat red-text text-darken-4"
+      >
+        <i class="material-icons left">cancel</i>
+        Cancelar reservacion
+      </a>
+    </div>
+  </div>
+</div>

@@ -90,7 +90,7 @@ exports.eliminarPelicula = async (req, res) => {
         res.redirect('/admin');
     } catch (error) {
         console.error('Error al eliminar la película:', error);
-        res.status(500).send('Error al eliminar la película de la base de datos');
+        res.status(500).send('Error al eliminar La pelicula, existen funciones asociadas a esta');
     }
 }
 
@@ -191,7 +191,7 @@ exports.eliminarEmpleado = async (req, res) => {
         res.redirect('/admin/empleados');
     } catch (error) {
         console.error('Error al eliminar el empleado:', error);
-        res.status(500).send('Error al eliminar el empleado de la base de datos');
+        res.status(500).send('Error al eliminar el empleado, existen tickets asociadas a este');
     }
 }
 
@@ -269,7 +269,7 @@ exports.eliminarSala = async (req, res) => {
         res.redirect('/admin/salas');
     } catch (error) {
         console.error('Error al eliminar la sala:', error);
-        res.status(500).send('Error al eliminar la sala de la base de datos');
+        res.status(500).send('Error al eliminar la sala, existen funciones asociadas a esta');
     }
 }
 
@@ -402,6 +402,6 @@ exports.eliminarFuncion = async (req, res) => {
         res.status(200).send('Función eliminada correctamente');
     } catch (error) {
         console.error('Error al eliminar la función:', error);
-        res.status(500).send('Error al eliminar la función de la base de datos');
+        res.status(500).send('Error al eliminar la función, existen tickets asociadas a esta');
     }
 }
